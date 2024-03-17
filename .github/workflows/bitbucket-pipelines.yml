@@ -41,7 +41,7 @@ jobs:
           export DOCKER_BUILDKIT=0
           
           cd food-products-service
-          mvn test
+          mvn clean install
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
           gcloud run deploy ${{env.SER_NAME}} --image $IMAGE_NAME --port ${{env.SER_PORT}} --region ${{env.REGION}} --cpu=2 --memory=8Gi --timeout=3000 --allow-unauthenticated || true

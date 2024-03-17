@@ -41,8 +41,6 @@ jobs:
           export DOCKER_BUILDKIT=0
           
           cd food-products-service
-          mvn clean
-          mvn install
           mvn test
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME

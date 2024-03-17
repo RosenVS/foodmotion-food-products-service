@@ -1,3 +1,16 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  PROJECT_ID: root-fort-412616 # TODO: update Google Cloud project id
+  APP_NAME: foodmotion-food-products-service # TODO: update Artifact Registry location
+  SER_NAME: foodmotion-food-products-service # TODO: update Artifact Registry location
+  REGION: europe-west1 # TODO: update Cloud Run service region
+  SER_PORT: 8080 # TODO: update Cloud Run service region
+
 jobs:
   deploy:
     # Add 'id-token' with the intended permissions for workload identity federation
@@ -9,10 +22,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      # Change directory to where your Maven project is located
-      - name: Change to project directory
-        run: cd foodmotion-food-products-service  # Update this to the correct directory if needed
+      # NOTE: Alternative option - authentication via credentials json
+      # - name: Google Auth
+      #   id: auth
+      #   uses: 'google-github-actions/auth@v0'
+      #   with:
+      #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}''
 
       # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
 
@@ -24,7 +39,9 @@ jobs:
           gcloud config set project ${{env.PROJECT_ID}}
           gcloud auth configure-docker europe-west1-docker.pkg.dev
           export DOCKER_BUILDKIT=0
-          mvn test  # This command will now be executed within the correct directory
+          
+          cd food-products-service
+          mvn test
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
           gcloud run deploy ${{env.SER_NAME}} --image $IMAGE_NAME --port ${{env.SER_PORT}} --region ${{env.REGION}} --cpu=2 --memory=8Gi --timeout=3000 --allow-unauthenticated || true

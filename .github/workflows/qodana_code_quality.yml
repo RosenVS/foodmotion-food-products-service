@@ -56,9 +56,6 @@ jobs:
           distribution: 'adopt'
           cache: 'maven'
 
-      - name: Validate Maven Wrapper
-        run: mvn --version
-        working-directory: JVM/intellij-coverage-agent/maven
 
       - name: Run Tests
         run: mvn test

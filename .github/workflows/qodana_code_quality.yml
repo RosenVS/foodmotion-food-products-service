@@ -1,25 +1,80 @@
-name: Qodana
+# name: Qodana
+# on:
+#   workflow_dispatch:
+#   pull_request:
+#   push:
+#     branches: # Specify your branches here
+#       - main # The 'main' branch
+#       - 'releases/*' # The release branches
+
+# jobs:
+#   qodana:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#       pull-requests: write
+#       checks: write
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
+#           fetch-depth: 0  # a full history is required for pull request analysis
+#       - name: 'Qodana Scan'
+#         uses: JetBrains/qodana-action@v2023.3
+#         env:
+#           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+
+
+
+name: IntelliJ Agent - Maven Test
+
 on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: # Specify your branches here
-      - main # The 'main' branch
-      - 'releases/*' # The release branches
+    branches:
+      - main
+      - 'releases/*'
 
 jobs:
-  qodana:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      checks: write
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
-          fetch-depth: 0  # a full history is required for pull request analysis
-      - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2023.3
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          cache: 'maven'
+
+      - name: Change Directory to food-products-service
+        run: cd food-products-service
+
+      - name: Validate Maven Wrapper
+        run: mvn --version
+        working-directory: JVM/intellij-coverage-agent/maven
+
+      - name: Run Tests
+        run: mvn test
+        working-directory: JVM/intellij-coverage-agent/maven
+      
+      - name: Archive coverage data
+        uses: actions/upload-artifact@v2
+        with:
+          name: maven-coverage-data
+          path: JVM/intellij-coverage-agent/maven/.qodana/code-coverage
+      
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@main
         env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MVN }}
+        with:
+          args: "-i,JVM/intellij-coverage-agent/maven,--linter,jetbrains/qodana-jvm:2023.3-eap"
+          pr-mode: false

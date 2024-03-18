@@ -24,6 +24,7 @@
 #         env:
 #           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
+
 name: IntelliJ Agent - Maven Test
 
 on:
@@ -55,22 +56,22 @@ jobs:
 
     - name: Validate Maven Wrapper
       run: mvn --version
-      working-directory: JVM/intellij-coverage-agent/maven
+      working-directory: food-products-service  # Adjusted working directory
 
     - name: Run Tests
       run: mvn test
-      working-directory: JVM/intellij-coverage-agent/maven
+      working-directory: food-products-service  # Adjusted working directory
       
     - name: Archive coverage data
       uses: actions/upload-artifact@v2
       with:
         name: maven-coverage-data
-        path: JVM/intellij-coverage-agent/maven/.qodana/code-coverage
+        path: food-products-service/.qodana/code-coverage  # Adjusted working directory
 
     - name: Qodana Scan
       uses: JetBrains/qodana-action@main
       env:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MVN }}
       with:
-        args: "-i,JVM/intellij-coverage-agent/maven,--linter,jetbrains/qodana-jvm:2023.3-eap"
+        args: "-i,food-products-service,--linter,jetbrains/qodana-jvm:2023.3-eap"  # Adjusted working directory
         pr-mode: false

@@ -24,8 +24,6 @@
 #         env:
 #           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
-
-
 name: IntelliJ Agent - Maven Test
 
 on:
@@ -38,39 +36,41 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
 
-      - name: Change Directory to food-products-service
-        run: cd food-products-service
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+        cache: 'maven'
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
-          distribution: 'adopt'
-          cache: 'maven'
+    - name: Validate Maven Wrapper
+      run: mvn --version
+      working-directory: JVM/intellij-coverage-agent/maven
 
-
-      - name: Run Tests
-        run: mvn test
-        working-directory: JVM/intellij-coverage-agent/maven
+    - name: Run Tests
+      run: mvn test
+      working-directory: JVM/intellij-coverage-agent/maven
       
-      - name: Archive coverage data
-        uses: actions/upload-artifact@v2
-        with:
-          name: maven-coverage-data
-          path: JVM/intellij-coverage-agent/maven/.qodana/code-coverage
-      
-      - name: Qodana Scan
-        uses: JetBrains/qodana-action@main
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MVN }}
-        with:
-          args: "-i,JVM/intellij-coverage-agent/maven,--linter,jetbrains/qodana-jvm:2023.3-eap"
-          pr-mode: false
+    - name: Archive coverage data
+      uses: actions/upload-artifact@v2
+      with:
+        name: maven-coverage-data
+        path: JVM/intellij-coverage-agent/maven/.qodana/code-coverage
+
+    - name: Qodana Scan
+      uses: JetBrains/qodana-action@main
+      env:
+        QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MVN }}
+      with:
+        args: "-i,JVM/intellij-coverage-agent/maven,--linter,jetbrains/qodana-jvm:2023.3-eap"
+        pr-mode: false

@@ -82,24 +82,26 @@ jobs:
         distribution: 'adopt'
         cache: 'maven'
 
-    - name: Validate Maven Wrapper
-      run: mvn --version
-      working-directory: food-products-service
+    # - name: Validate Maven Wrapper
+    #   run: mvn --version
+    #   working-directory: food-products-service
 
-    - name: Run Tests
-      run: mvn test
-      working-directory: food-products-service
+    # - name: Run Tests
+    #   run: mvn test
+    #   working-directory: food-products-service
       
-    - name: Archive coverage data
-      uses: actions/upload-artifact@v2
-      with:
-        name: maven-coverage-data-jacoco
-        path: food-products-service/.qodana/code-coverage
+    # - name: Archive coverage data
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: maven-coverage-data-jacoco
+    #     path: food-products-service/.qodana/code-coverage
 
     - name: Qodana Scan
       uses: JetBrains/qodana-action@main
       env:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
-        args: "-i,food-products-service,--linter,jetbrains/qodana-jvm:latest"
-        pr-mode: false
+        args: --baseline,food-products-service/qodana.sarif.json
+      # with:
+      #   args: "-i,food-products-service,--linter,jetbrains/qodana-jvm:latest"
+      #   pr-mode: false

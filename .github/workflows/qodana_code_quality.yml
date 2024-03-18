@@ -99,7 +99,7 @@ jobs:
     - name: Qodana Scan
       uses: JetBrains/qodana-action@main
       env:
-        QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MVN_JACOCO }}
+        QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
         args: "-i,food-products-service,--linter,jetbrains/qodana-jvm:2023.3-eap"
         pr-mode: false

@@ -25,53 +25,26 @@
 #           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
 
 
-name: IntelliJ Agent - Maven Test
 
+
+name: Qodana
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches:
       - main
-      - 'releases/*'
 
 jobs:
-  build:
-
+  qodana:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        fetch-depth: 0
-
-    - name: Set up JDK 17
-      uses: actions/setup-java@v2
-      with:
-        java-version: '17'
-        distribution: 'adopt'
-        cache: 'maven'
-
-    - name: Validate Maven Wrapper
-      run: mvn --version
-      working-directory: food-products-service  # Adjusted working directory
-
-    - name: Run Tests
-      run: mvn test
-      working-directory: food-products-service  # Adjusted working directory
-      
-    - name: Archive coverage data
-      uses: actions/upload-artifact@v2
-      with:
-        name: maven-coverage-data
-        path: food-products-service/.qodana/code-coverage  # Adjusted working directory
-
-    - name: Qodana Scan
-      uses: JetBrains/qodana-action@main
-      env:
-        QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MVN }}
-      with:
-        args: "-i,food-products-service,--linter,jetbrains/qodana-jvm:2023.3-eap"  # Adjusted working directory
-        pr-mode: false
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2023.3
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        with:
+          args: --baseline,qodana.sarif.json

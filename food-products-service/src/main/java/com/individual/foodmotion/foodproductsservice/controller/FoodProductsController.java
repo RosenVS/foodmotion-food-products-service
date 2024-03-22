@@ -20,7 +20,7 @@ public class FoodProductsController {
     @GetMapping("test")
     public ResponseEntity<String> getHello() {
         // Change the return value to "hello world"
-        return ResponseEntity.ok("hello world v2 demo");
+        return ResponseEntity.ok("hello world");
     }
 
     @GetMapping

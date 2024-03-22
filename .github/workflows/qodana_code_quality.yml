@@ -101,7 +101,7 @@ jobs:
       env:
         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
       with:
-        args: --baseline,food-products-service/qodana.sarif.json
+        args: --baseline,qodana.sarif.json
       # with:
       #   args: "-i,food-products-service,--linter,jetbrains/qodana-jvm:latest"
       #   pr-mode: false

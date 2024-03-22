@@ -35,7 +35,7 @@ public class FoodProductServiceTestPassingTest {
     void testGetHello() {
         ResponseEntity<String> response = controller.getHello();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("hello world", response.getBody());
+        assertEquals("hello world v2 demo - hv3jb1kn3ml1", response.getBody());
     }
 
     @Test

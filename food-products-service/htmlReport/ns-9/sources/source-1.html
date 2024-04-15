@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FoodProductService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.individual.foodmotion.foodproductsservice.service</a>
+</div>
+
+<h1>Coverage Summary for Class: FoodProductService (com.individual.foodmotion.foodproductsservice.service)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FoodProductService</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.2%
+  </span>
+  <span class="absValue">
+    (1/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FoodProductService$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (1/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    3.2%
+  </span>
+  <span class="absValue">
+    (1/31)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.individual.foodmotion.foodproductsservice.service;
+&nbsp;
+&nbsp;import com.individual.foodmotion.foodproductsservice.dto.requests.FoodProductRequestDTO;
+&nbsp;import com.individual.foodmotion.foodproductsservice.dto.responses.FoodProductResponseDTO;
+&nbsp;import com.individual.foodmotion.foodproductsservice.exception.ResourceNotFoundException;
+&nbsp;import com.individual.foodmotion.foodproductsservice.map.FoodProductMapper;
+&nbsp;import com.individual.foodmotion.foodproductsservice.model.DietaryRestrictions;
+&nbsp;import com.individual.foodmotion.foodproductsservice.model.FoodProduct;
+&nbsp;import com.individual.foodmotion.foodproductsservice.model.Nutrition;
+&nbsp;import com.individual.foodmotion.foodproductsservice.repository.FoodProductRepository;
+&nbsp;import jakarta.transaction.Transactional;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@Transactional
+&nbsp;public class FoodProductService {
+&nbsp;    private final FoodProductRepository foodProductRepository;
+&nbsp;    private final FoodProductMapper foodProductMapper;
+&nbsp;    public List&lt;FoodProductResponseDTO&gt; getAllFoodProducts() {
+<b class="nc">&nbsp;        List&lt;FoodProduct&gt; foodProducts = foodProductRepository.findAll();</b>
+<b class="nc">&nbsp;        return foodProducts.stream()</b>
+<b class="nc">&nbsp;                .map(foodProductMapper::mapToResponseDto)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FoodProductResponseDTO getFoodProductById(Long id) {
+<b class="nc">&nbsp;        FoodProduct foodProduct = foodProductRepository.findById(id)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;FoodProduct Not Found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return foodProductMapper.mapToResponseDto(foodProduct);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FoodProductResponseDTO createFoodProduct(FoodProductRequestDTO foodProductRequestDTO) {
+<b class="nc">&nbsp;        FoodProduct foodProduct = foodProductMapper.mapToEntity(foodProductRequestDTO);</b>
+<b class="nc">&nbsp;        FoodProduct savedFoodProduct = foodProductRepository.save(foodProduct);</b>
+<b class="nc">&nbsp;        return foodProductMapper.mapToResponseDto(savedFoodProduct);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FoodProductResponseDTO updateFoodProduct(Long id, FoodProductRequestDTO foodProductRequestDTO) {
+<b class="nc">&nbsp;        FoodProduct existingFoodProduct = foodProductRepository.findById(id)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;FoodProduct Not Found&quot;));</b>
+&nbsp;
+&nbsp;        // Update existingFoodProduct with data from foodProductRequestDTO
+<b class="nc">&nbsp;        existingFoodProduct.setName(foodProductRequestDTO.getName());</b>
+&nbsp;
+&nbsp;        // Update Nutrition
+<b class="nc">&nbsp;        Nutrition nutrition = existingFoodProduct.getNutrition();</b>
+<b class="nc">&nbsp;        nutrition.getProtein().setTotalProtein(foodProductRequestDTO.getNutrition().getProtein().getTotalProtein());</b>
+<b class="nc">&nbsp;        nutrition.getFat().setTotalFat(foodProductRequestDTO.getNutrition().getFat().getTotalFat());</b>
+<b class="nc">&nbsp;        nutrition.getFat().setTransFat(foodProductRequestDTO.getNutrition().getFat().getTransFat());</b>
+<b class="nc">&nbsp;        nutrition.getCarbs().setTotalCarbs(foodProductRequestDTO.getNutrition().getCarbs().getTotalCarbs());</b>
+<b class="nc">&nbsp;        nutrition.getCarbs().setSugar(foodProductRequestDTO.getNutrition().getCarbs().getSugar());</b>
+&nbsp;
+&nbsp;        // Update DietaryRestrictions
+<b class="nc">&nbsp;        DietaryRestrictions dietaryRestrictions = existingFoodProduct.getDietaryRestrictions();</b>
+<b class="nc">&nbsp;        dietaryRestrictions.setGlutenFree(foodProductRequestDTO.getDietaryRestrictions().isGlutenFree());</b>
+<b class="nc">&nbsp;        dietaryRestrictions.setLactoseFree(foodProductRequestDTO.getDietaryRestrictions().isLactoseFree());</b>
+<b class="nc">&nbsp;        dietaryRestrictions.setVegan(foodProductRequestDTO.getDietaryRestrictions().isVegan());</b>
+<b class="nc">&nbsp;        dietaryRestrictions.setVegetarian(foodProductRequestDTO.getDietaryRestrictions().isVegetarian());</b>
+&nbsp;
+&nbsp;        // Save the updated food product
+<b class="nc">&nbsp;        FoodProduct updatedFoodProduct = foodProductRepository.save(existingFoodProduct);</b>
+<b class="nc">&nbsp;        return foodProductMapper.mapToResponseDto(updatedFoodProduct);</b>
+&nbsp;    }
+&nbsp;    public boolean deleteFoodProduct(Long id) {
+<b class="nc">&nbsp;        FoodProduct foodProduct = foodProductRepository.findById(id)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;FoodProduct Not Found&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        foodProductRepository.delete(foodProduct);</b>
+&nbsp;
+&nbsp;        // Check if the food product is still present in the repository after deletion
+<b class="nc">&nbsp;        return !foodProductRepository.existsById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-04-15 11:51</div>
+</div>
+</body>
+</html>

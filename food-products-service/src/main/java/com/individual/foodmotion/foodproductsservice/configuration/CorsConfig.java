@@ -16,7 +16,7 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://foodmotion-frontend-ud3f4nfe5a-ew.a.run.app")
+                        .allowedOrigins("http://localhost:3000", "https://foodmotion-frontend-hlfxsphkja-ew.a.run.app")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*");
             }

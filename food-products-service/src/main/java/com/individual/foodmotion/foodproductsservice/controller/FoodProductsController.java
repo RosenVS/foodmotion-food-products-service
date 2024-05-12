@@ -7,6 +7,7 @@ import com.individual.foodmotion.foodproductsservice.service.FoodProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,10 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/food-product")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class FoodProductsController {
     private final FoodProductService foodProductService;
 
     @GetMapping("test")
+    @PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<String> getHello() {
         // Change the return value to "hello world"
         return ResponseEntity.ok("hello world v2 demo - hv3jb1kn3ml1");
@@ -36,18 +39,21 @@ public class FoodProductsController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('MANAGER') && hasAuthority('FOOD_PRODUCT')")
     public ResponseEntity<FoodProductResponseDTO> createFoodProduct(@RequestBody FoodProductRequestDTO foodProductRequestDTO) {
         FoodProductResponseDTO createdFoodProduct = foodProductService.createFoodProduct(foodProductRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdFoodProduct);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('MANAGER') && hasAuthority('FOOD_PRODUCT')")
     public ResponseEntity<FoodProductResponseDTO> updateFoodProduct(@PathVariable Long id, @RequestBody FoodProductRequestDTO foodProductRequestDTO) {
         FoodProductResponseDTO updatedFoodProduct = foodProductService.updateFoodProduct(id, foodProductRequestDTO);
         return ResponseEntity.ok(updatedFoodProduct);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('MANAGER') && hasAuthority('FOOD_PRODUCT')")
     public ResponseEntity<Boolean> deleteFoodProduct(@PathVariable Long id) {
         boolean deletionSuccessful = foodProductService.deleteFoodProduct(id);
         return ResponseEntity.ok(deletionSuccessful);

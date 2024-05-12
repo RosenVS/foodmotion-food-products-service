@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,6 +45,7 @@ public class FoodProductServiceIntegrationTest {
         MockitoAnnotations.initMocks(this);
     }
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testCreateFoodProduct_NotFound() throws Exception {
         // Arrange
         long id = 2L;
@@ -66,6 +68,7 @@ public class FoodProductServiceIntegrationTest {
                 .andExpect(content().string(""));
     }
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testGetFoodProductById_NotFound() throws Exception {
         // Arrange
         long id = 2L;
@@ -80,6 +83,7 @@ public class FoodProductServiceIntegrationTest {
                 .andExpect(content().string(""));
     }
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testDeleteFoodProduct_False() throws Exception {
         // Arrange
         long id = 2L;
@@ -94,6 +98,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testUpdateFoodProduct_NotFound() throws Exception {
         // Arrange
         long id = 2L;

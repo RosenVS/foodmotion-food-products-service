@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -50,6 +51,7 @@ public class FoodProductServiceIntegrationTest {
         MockitoAnnotations.initMocks(this);
     }
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testCreateFoodProduct() throws Exception {
         // Arrange
         FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
@@ -85,6 +87,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testUpdateFoodProduct() throws Exception {
         // Arrange
         long id = 2L;
@@ -121,6 +124,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testDeleteFoodProduct() throws Exception {
         // Arrange
         long id = 2L;
@@ -158,6 +162,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
     void testGetFoodProductById() throws Exception {
         // Arrange
         long id = 2L;

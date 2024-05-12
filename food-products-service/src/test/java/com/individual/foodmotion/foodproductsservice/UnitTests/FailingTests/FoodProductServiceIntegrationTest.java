@@ -45,7 +45,7 @@ public class FoodProductServiceIntegrationTest {
         MockitoAnnotations.initMocks(this);
     }
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testCreateFoodProduct_NotFound() throws Exception {
         // Arrange
         long id = 2L;
@@ -68,7 +68,7 @@ public class FoodProductServiceIntegrationTest {
                 .andExpect(content().string(""));
     }
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testGetFoodProductById_NotFound() throws Exception {
         // Arrange
         long id = 2L;
@@ -83,7 +83,7 @@ public class FoodProductServiceIntegrationTest {
                 .andExpect(content().string(""));
     }
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testDeleteFoodProduct_False() throws Exception {
         // Arrange
         long id = 2L;
@@ -98,7 +98,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testUpdateFoodProduct_NotFound() throws Exception {
         // Arrange
         long id = 2L;

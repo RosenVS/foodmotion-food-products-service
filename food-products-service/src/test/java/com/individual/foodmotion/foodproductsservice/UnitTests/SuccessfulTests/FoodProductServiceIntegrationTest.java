@@ -51,7 +51,7 @@ public class FoodProductServiceIntegrationTest {
         MockitoAnnotations.initMocks(this);
     }
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testCreateFoodProduct() throws Exception {
         // Arrange
         FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
@@ -87,7 +87,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testUpdateFoodProduct() throws Exception {
         // Arrange
         long id = 2L;
@@ -124,7 +124,7 @@ public class FoodProductServiceIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = {"MANAGER", "FOOD_PRODUCT"})
+    @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testDeleteFoodProduct() throws Exception {
         // Arrange
         long id = 2L;

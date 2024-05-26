@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/food-product")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://foodmotion-frontend-hlfxsphkja-ew.a.run.app","https://foodmotion-api-gateway-6xxrfy77.ew.gateway.dev"})
 public class FoodProductsController {
     private final FoodProductService foodProductService;
     private final RabbitMQJsonProducer jsonProducer;

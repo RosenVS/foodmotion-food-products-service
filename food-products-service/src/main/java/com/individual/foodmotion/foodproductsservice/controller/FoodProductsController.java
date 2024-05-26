@@ -2,9 +2,12 @@ package com.individual.foodmotion.foodproductsservice.controller;
 
 
 import com.individual.foodmotion.foodproductsservice.dto.requests.FoodProductRequestDTO;
+import com.individual.foodmotion.foodproductsservice.dto.requests.StatusUpdateRequest;
 import com.individual.foodmotion.foodproductsservice.dto.responses.FoodProductResponseDTO;
+import com.individual.foodmotion.foodproductsservice.rabbitmq.producer.RabbitMQJsonProducer;
 import com.individual.foodmotion.foodproductsservice.service.FoodProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +21,10 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class FoodProductsController {
     private final FoodProductService foodProductService;
+    private final RabbitMQJsonProducer jsonProducer;
+
+
+
 
     @GetMapping("test")
     @PreAuthorize("hasAuthority('MANAGER')")
@@ -57,6 +64,14 @@ public class FoodProductsController {
     public ResponseEntity<Boolean> deleteFoodProduct(@PathVariable Long id) {
         boolean deletionSuccessful = foodProductService.deleteFoodProduct(id);
         return ResponseEntity.ok(deletionSuccessful);
+    }
+
+    @PutMapping("recipe/status")
+    @PreAuthorize("hasAuthority('MANAGER') && hasAuthority('FOOD_PRODUCT')")
+    public ResponseEntity<String> updateRecipeStatus(@RequestBody StatusUpdateRequest statusUpdateRequest) {
+        jsonProducer.sendRecipeStatusUpdateMessage(statusUpdateRequest);
+
+        return ResponseEntity.ok("Update Recipe status message send ...");
     }
 
 

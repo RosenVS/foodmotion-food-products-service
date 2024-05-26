@@ -67,6 +67,9 @@ public class FoodProductServiceIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
+
+
+
     @Test
     @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testGetFoodProductById_NotFound() throws Exception {
@@ -88,36 +91,149 @@ public class FoodProductServiceIntegrationTest {
         // Arrange
         long id = 2L;
 
-        // Mock the service to return false when deleteFoodProduct is called
         when(foodProductService.deleteFoodProduct(id)).thenReturn(false);
 
-        // Act & Assert
         mockMvc.perform(delete("/api/food-product/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("false"));
     }
 
+
+
     @Test
     @WithMockUser(authorities = {"MANAGER","FOOD_PRODUCT"})
     void testUpdateFoodProduct_NotFound() throws Exception {
-        // Arrange
         long id = 2L;
         FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
         requestDTO.setName("Sample Food Product");
         requestDTO.setNutrition(null); // Set nutrition to null to simulate the case where the food product is not found
         requestDTO.setDietaryRestrictions(null); // Set dietary restrictions to null for simplicity
 
-        // Mock the service to throw ResourceNotFoundException when updateFoodProduct is called
         when(foodProductService.updateFoodProduct(eq(id), any(FoodProductRequestDTO.class)))
                 .thenThrow(new ResourceNotFoundException("Food product not found"));
 
         String requestBody = objectMapper.writeValueAsString(requestDTO);
 
-        // Act & Assert
         mockMvc.perform(put("/api/food-product/{id}", id)
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
     }
+
+    @Test
+    @WithMockUser(authorities = {"User","FOOD_PRODUCT"})
+    void testDeleteFoodProduct_Forbiden() throws Exception {
+        // Arrange
+        long id = 2L;
+
+        when(foodProductService.deleteFoodProduct(id)).thenReturn(false);
+
+        mockMvc.perform(delete("/api/food-product/{id}", id))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @WithMockUser(authorities = {"User","FOOD_PRODUCT"})
+    void testUpdateFoodProduct_Forbiden() throws Exception {
+        long id = 2L;
+        FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
+        requestDTO.setName("Sample Food Product");
+        requestDTO.setNutrition(null); // Set nutrition to null to simulate the case where the food product is not found
+        requestDTO.setDietaryRestrictions(null); // Set dietary restrictions to null for simplicity
+
+        when(foodProductService.updateFoodProduct(eq(id), any(FoodProductRequestDTO.class)))
+                .thenThrow(new ResourceNotFoundException("Food product not found"));
+
+        String requestBody = objectMapper.writeValueAsString(requestDTO);
+
+        mockMvc.perform(put("/api/food-product/{id}", id)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string(""));
+    }
+    @Test
+    @WithMockUser(authorities = {"User","FOOD_PRODUCT"})
+    void testCreateFoodProduct_Forbiden() throws Exception {
+        // Arrange
+        long id = 2L;
+        FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
+        requestDTO.setName("Sample Food Product");
+        requestDTO.setNutrition(null); // Set nutrition to null for simplicity
+        requestDTO.setDietaryRestrictions(null); // Set dietary restrictions to null for simplicity
+
+        // Mock the service to throw ResourceNotFoundException when createFoodProduct is called
+        when(foodProductService.createFoodProduct(any(FoodProductRequestDTO.class)))
+                .thenThrow(new ResourceNotFoundException("Food product not found"));
+
+        String requestBody = objectMapper.writeValueAsString(requestDTO);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/food-product")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    void testCreateFoodProduct_UnAuth() throws Exception {
+        // Arrange
+        long id = 2L;
+        FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
+        requestDTO.setName("Sample Food Product");
+        requestDTO.setNutrition(null); // Set nutrition to null for simplicity
+        requestDTO.setDietaryRestrictions(null); // Set dietary restrictions to null for simplicity
+
+        // Mock the service to throw ResourceNotFoundException when createFoodProduct is called
+        when(foodProductService.createFoodProduct(any(FoodProductRequestDTO.class)))
+                .thenThrow(new ResourceNotFoundException("Food product not found"));
+
+        String requestBody = objectMapper.writeValueAsString(requestDTO);
+
+        // Act & Assert
+        mockMvc.perform(post("/api/food-product")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string(""));
+    }
+
+
+    @Test
+    void testDeleteFoodProduct_UnAuth() throws Exception {
+        // Arrange
+        long id = 2L;
+
+        when(foodProductService.deleteFoodProduct(id)).thenReturn(false);
+
+        mockMvc.perform(delete("/api/food-product/{id}", id))
+                .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    void testUpdateFoodProduct_UnAuth() throws Exception {
+        long id = 2L;
+        FoodProductRequestDTO requestDTO = new FoodProductRequestDTO();
+        requestDTO.setName("Sample Food Product");
+        requestDTO.setNutrition(null); // Set nutrition to null to simulate the case where the food product is not found
+        requestDTO.setDietaryRestrictions(null); // Set dietary restrictions to null for simplicity
+
+        when(foodProductService.updateFoodProduct(eq(id), any(FoodProductRequestDTO.class)))
+                .thenThrow(new ResourceNotFoundException("Food product not found"));
+
+        String requestBody = objectMapper.writeValueAsString(requestDTO);
+
+        mockMvc.perform(put("/api/food-product/{id}", id)
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().string(""));
+    }
+
+
+
 }

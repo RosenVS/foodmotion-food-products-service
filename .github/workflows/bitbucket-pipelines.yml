@@ -70,8 +70,7 @@
 
 
 
-
-name: Build and Deploy to Cloud Run
+name: Build and Deploy to GKE
 
 on:
   push:
@@ -86,15 +85,14 @@ env:
   DEPLOYMENT_NAME: foodmotion-food-products-deployment # TODO: update GKE deployment name
   SERVICE_NAME: foodmotion-food-products-service # TODO: update GKE service name
 
-
 jobs:
   deploy:
-    # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
       contents: 'read'
       id-token: 'write'
 
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -104,41 +102,34 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      # NOTE: Alternative option - authentication via credentials json
-      # - name: Google Auth
-      #   id: auth
-      #   uses: 'google-github-actions/auth@v0'
-      #   with:
-      #     credentials_json: '${{ secrets.GCP_CREDENTIALS }}''
 
-      # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
 
-      # - name: Build Image, Push to Registry, Deploy to Cloud Run
-      #   run: |
-      #     export IMAGE_NAME=europe-west1-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.APP_NAME}}/${{env.SER_NAME}}:$GITHUB_SHA
-      #     echo "${KEY_FILE}" > client-secret.json
-      #     gcloud auth activate-service-account ${{env.PROJECT_ID}}@appspot.gserviceaccount.com --key-file ${{env.PROJECT_ID}}-3f48ad93aa23.json
-      #     gcloud config set project ${{env.PROJECT_ID}}
-      #     gcloud auth configure-docker europe-west1-docker.pkg.dev
-      #     export DOCKER_BUILDKIT=0
-          
-      #     cd food-products-service
-      #     docker build -t $IMAGE_NAME .
-      #     docker push $IMAGE_NAME
-      #     gcloud run deploy ${{env.SER_NAME}} --image $IMAGE_NAME --port ${{env.SER_PORT}} --region ${{env.REGION}} --cpu=2  --memory=8Gi --timeout=3000 --allow-unauthenticated || true
-
-      - name: Build Image, Push to Registry, Deploy to Cloud Run
+      - name: Configure gcloud CLI
         run: |
-          export IMAGE_NAME=europe-west1-docker.pkg.dev/${{env.PROJECT_ID}}/${{env.APP_NAME}}/${{env.SER_NAME}}:$GITHUB_SHA
+          gcloud config set project ${{ env.PROJECT_ID }}
+          gcloud config set compute/zone ${{ env.ZONE }}
+
+      - name: Get GKE credentials
+        run: |
+          gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }}
+
+      - name: Build and push Docker image
+        run: |
+          export IMAGE_NAME=europe-west1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.APP_NAME }}:$GITHUB_SHA
           echo '${{ secrets.KEY_FILE }}' | jq '.' > client-secret.json
-          gcloud auth activate-service-account individual-account@inbound-pattern-422518-k7.iam.gserviceaccount.com --key-file client-secret.json
-          gcloud config set project ${{env.PROJECT_ID}}
+          gcloud auth activate-service-account individual-account@${{ env.PROJECT_ID }}.iam.gserviceaccount.com --key-file client-secret.json
+          gcloud config set project ${{ env.PROJECT_ID }}
           gcloud auth configure-docker europe-west1-docker.pkg.dev
-          export DOCKER_BUILDKIT=0
           cd food-products-service
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
 
+      - name: Deploy to GKE
+        run: |
           kubectl apply -f - <<EOF
           apiVersion: apps/v1
           kind: Deployment
@@ -175,6 +166,3 @@ jobs:
                 port: 80
                 targetPort: 8080
           EOF
-        env:
-          KEY_FILE: ${{ secrets.KEY_FILE }}
-    

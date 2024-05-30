@@ -136,7 +136,7 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
           
-          gcloud container clusters create $SER_NAME -num-nodes=1
+          gcloud container clusters create $SER_NAME --num-nodes=1
           kubectl create deployment $SER_NAME --image=$IMAGE_NAME
           kubectl expose deployment $SER_NAME --type LoadBalancer --port $SER_PORT --target-port $SER_PORT
 

@@ -136,9 +136,12 @@ jobs:
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
           
-          gcloud container clusters create $SER_NAME --num-nodes=1 --zone=europe-west1-b
-          kubectl create deployment $SER_NAME --image=$IMAGE_NAME
-          kubectl expose deployment $SER_NAME --type LoadBalancer --port $SER_PORT --target-port $SER_PORT
+          gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE --project ${{env.PROJECT_ID}}
+          kubectl apply -f k8s-deployment.yaml
+          kubectl apply -f k8s-service.yaml
+          kubectl rollout status deployment/$SERVICE_NAME
+          kubectl get services
+
 
 
         env:
